@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>History – Mobile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:16px;
+}
+
+.card{
+  background:#020617;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.in{color:#4ade80;font-weight:800}
+.out{color:#fb7185;font-weight:800}
+.money{font-size:20px;font-weight:800}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+
+.bottom-nav a{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  padding:14px;
+  border-radius:999px;
+  background:#2563eb;
+  color:white;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<div id="list"></div>
+
+<div class="bottom-nav">
+  <a href="indexmobile.html">➕ Add</a>
+  <a href="history.html">🖥 Desktop</a>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
+
+async function load(){
+  const res=await fetch(API_URL);
+  const data=await res.json();
+  list.innerHTML="";
+
+  data.reverse().forEach(t=>{
+    list.innerHTML+=`
+      <div class="card">
+        <div class="top">
+          <div>${t.date}</div>
+          <div class="${t.type==="IN"?"in":"out"}">${t.type}</div>
+        </div>
+        <div class="money">₹${t.amount}</div>
+        <div>${t.category}</div>
+        <small>${t.note||""}</small>
+      </div>
+    `;
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
