@@ -25,6 +25,12 @@ body{
 
 h2{margin:0 0 10px}
 
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:600;
+}
+
 input,select{
   width:100%;
   padding:14px;
@@ -64,9 +70,10 @@ button.save{
   color:white;
   font-size:18px;
   font-weight:800;
-  margin-top:10px;
+  margin-top:16px;
 }
 
+/* BOTTOM NAV */
 .bottom-nav{
   position:fixed;
   bottom:0;
@@ -87,6 +94,7 @@ button.save{
   background:#2563eb;
   color:white;
   font-weight:700;
+  font-size:14px;
 }
 </style>
 </head>
@@ -137,9 +145,11 @@ button.save{
   <button class="save" onclick="saveTx()">Save</button>
 </div>
 
+<!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
+  <a href="indexmobile.html">➕ Add</a>
   <a href="historymobile.html">📜 History</a>
-  <a href="index.html">🖥 Desktop</a>
+  <a href="analyticsmobile.html">📊 Analytics</a>
 </div>
 
 <script>
@@ -156,7 +166,7 @@ function setType(t){
 }
 
 async function saveTx(){
-  if(!type || !amount.value) return alert("Fill all");
+  if(!type || !amount.value) return alert("Fill all fields");
 
   await fetch(API_URL,{
     method:"POST",
