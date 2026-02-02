@@ -7,7 +7,6 @@
 <style>
 *{box-sizing:border-box}
 
-/* FONTS */
 body{
   margin:0;
   font-family:Candara, Calibri, Segoe, sans-serif;
@@ -31,16 +30,27 @@ body{
   margin-bottom:20px;
 }
 
-.header h2{margin:0}
-
-.header a{
-  text-decoration:none;
-  background:#2563eb;
-  color:white;
-  padding:8px 14px;
-  border-radius:999px;
-  font-size:14px;
+/* SUMMARY CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-bottom:25px;
 }
+
+.card{
+  background:white;
+  padding:18px;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.card h4{margin:0;font-size:13px;color:#6b7280}
+.card p{margin:8px 0 0;font-size:24px}
+
+.in{color:#16a34a}
+.out{color:#dc2626}
+.net{color:#2563eb}
 
 /* FILTERS */
 .filters{
@@ -48,7 +58,7 @@ body{
   padding:16px;
   border-radius:14px;
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:14px;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
   margin-bottom:25px;
@@ -56,11 +66,10 @@ body{
 
 label{font-size:13px;color:#374151}
 
-select{
+select,button{
   padding:10px;
   border-radius:8px;
   border:1px solid #d1d5db;
-  font-family:Candara, Calibri, Segoe, sans-serif;
 }
 
 /* TABLE */
@@ -72,53 +81,44 @@ select{
 }
 
 table{width:100%;border-collapse:collapse}
-
 thead{background:#2563eb}
-
-th{
-  color:white;
-  padding:12px;
-  text-align:left;
-  font-size:13px;
-}
-
+th{color:white;padding:12px;text-align:left;font-size:13px}
 td{padding:14px;font-size:14px}
-
 tbody tr{border-bottom:1px solid #e5e7eb}
-
-.in{color:#16a34a;font-weight:700}
-.out{color:#dc2626;font-weight:700}
-
-button{
-  border:none;
-  background:none;
-  cursor:pointer;
-  font-size:13px;
-}
-
-.edit{color:#2563eb}
-.delete{color:#dc2626}
-
-img.proof{
-  width:40px;
-  border-radius:8px;
-  cursor:pointer;
-}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<!-- HEADER -->
 <div class="header">
   <h2>Transaction History</h2>
-  <a href="index.html">← Back to Dashboard</a>
+  <a href="index.html">← Back</a>
+</div>
+
+<!-- SUMMARY -->
+<div class="cards">
+  <div class="card">
+    <h4>Total IN</h4>
+    <p class="money in" id="totalIn">₹0</p>
+  </div>
+  <div class="card">
+    <h4>Total OUT</h4>
+    <p class="money out" id="totalOut">₹0</p>
+  </div>
+  <div class="card">
+    <h4>Net Balance</h4>
+    <p class="money net" id="netTotal">₹0</p>
+  </div>
 </div>
 
 <!-- FILTERS -->
 <div class="filters">
+  <div>
+    <label>Year</label>
+    <select id="yearFilter"></select>
+  </div>
+
   <div>
     <label>Month</label>
     <select id="monthFilter"></select>
@@ -147,8 +147,7 @@ img.proof{
 
   <div>
     <label>&nbsp;</label>
-    <button onclick="applyFilters()"
-      style="background:#2563eb;color:white;padding:10px;border-radius:999px">
+    <button onclick="applyFilters()" style="background:#2563eb;color:white">
       Apply
     </button>
   </div>
@@ -163,9 +162,7 @@ img.proof{
   <th>Type</th>
   <th>Category</th>
   <th>Amount</th>
-  <th>Proof</th>
   <th>Note</th>
-  <th>Action</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -175,100 +172,76 @@ img.proof{
 </div>
 
 <script>
-/* =================================================
-   🔴 PASTE GOOGLE WEB APP URL HERE (IMPORTANT)
-   ================================================= */
 const API_URL = "https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
-/* Example:
-const API_URL = "https://script.google.com/macros/s/AKfycbxxxx/exec";
-*/
 
-let transactions = [];
-let filtered = [];
-const table = document.getElementById("table");
+let transactions=[], filtered=[];
+const table=document.getElementById("table");
 
-/* FETCH FROM GOOGLE SHEET */
+/* FETCH */
 async function fetchTransactions(){
-  const res = await fetch(API_URL);
-  transactions = await res.json();
-  filtered = [...transactions];
-  setupMonthFilter();
-  render();
+  const res=await fetch(API_URL);
+  transactions=await res.json();
+  setupYearMonth();
+  applyFilters();
 }
 
-/* MONTH DROPDOWN */
-function setupMonthFilter(){
-  const monthSet = new Set(transactions.map(t => t.date.slice(0,7)));
-  monthFilter.innerHTML = `<option value="">All</option>`;
-  [...monthSet].sort().reverse().forEach(m=>{
-    monthFilter.innerHTML += `<option value="${m}">${m}</option>`;
-  });
+/* YEAR & MONTH */
+function setupYearMonth(){
+  const years=[...new Set(transactions.map(t=>t.date.slice(0,4)))].sort().reverse();
+  yearFilter.innerHTML='<option value="">All</option>';
+  years.forEach(y=>yearFilter.innerHTML+=`<option>${y}</option>`);
+
+  yearFilter.onchange=()=>{
+    const months=[...new Set(transactions
+      .filter(t=>t.date.startsWith(yearFilter.value))
+      .map(t=>t.date.slice(0,7))
+    )];
+    monthFilter.innerHTML='<option value="">All</option>';
+    months.forEach(m=>monthFilter.innerHTML+=`<option value="${m}">${m}</option>`);
+  };
 }
 
 /* FILTER */
 function applyFilters(){
-  filtered = transactions.filter(t=>{
+  filtered=transactions.filter(t=>{
+    if(yearFilter.value && !t.date.startsWith(yearFilter.value)) return false;
     if(monthFilter.value && !t.date.startsWith(monthFilter.value)) return false;
-    if(typeFilter.value && t.type !== typeFilter.value) return false;
-    if(categoryFilter.value && t.category !== categoryFilter.value) return false;
+    if(typeFilter.value && t.type!==typeFilter.value) return false;
+    if(categoryFilter.value && t.category!==categoryFilter.value) return false;
     return true;
   });
   render();
+  totals();
 }
 
-/* RENDER */
+/* TOTALS */
+function totals(){
+  let tin=0,tout=0;
+  filtered.forEach(t=>{
+    t.type==="IN"?tin+=+t.amount:tout+=+t.amount;
+  });
+  totalIn.textContent=`₹${tin}`;
+  totalOut.textContent=`₹${tout}`;
+  netTotal.textContent=`₹${tin-tout}`;
+}
+
+/* TABLE */
 function render(){
   table.innerHTML="";
-  filtered.forEach((t,i)=>{
-    table.innerHTML += `
+  filtered.forEach(t=>{
+    table.innerHTML+=`
       <tr>
         <td>${t.date}</td>
         <td class="${t.type==="IN"?"in":"out"}">${t.type}</td>
         <td>${t.category}</td>
         <td class="money">₹${t.amount}</td>
-        <td>${t.proof ? `<img class="proof" src="${t.proof}" onclick="open('${t.proof}')">` : "-"}</td>
-        <td>${t.note}</td>
-        <td>
-          <button class="edit" onclick="editTx('${t.id}')">Edit</button>
-          |
-          <button class="delete" onclick="delTx('${t.id}')">Delete</button>
-        </td>
+        <td>${t.note||"-"}</td>
       </tr>
     `;
   });
 }
 
-/* EDIT (amount only – safe) */
-async function editTx(id){
-  const tx = transactions.find(t => t.id === id);
-  const amount = prompt("Edit amount", tx.amount);
-  if(amount === null || amount <= 0) return;
-
-  tx.amount = +amount;
-
-  await fetch(API_URL, {
-    method: "PUT",
-    body: JSON.stringify(tx)
-  });
-
-  fetchTransactions();
-}
-
-/* DELETE (double confirm) */
-async function delTx(id){
-  if(!confirm("Do you want to delete this transaction?")) return;
-  if(!confirm("Are you REALLY sure?")) return;
-
-  await fetch(`${API_URL}?id=${id}`, {
-    method: "DELETE"
-  });
-
-  fetchTransactions();
-}
-
-/* INIT */
 fetchTransactions();
 </script>
-
 </body>
 </html>
