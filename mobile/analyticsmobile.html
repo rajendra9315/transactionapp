@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Analytics – Mobile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont;
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:16px;
+}
+
+/* SUMMARY CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.card{
+  padding:20px;
+  border-radius:22px;
+  color:white;
+  box-shadow:0 15px 35px rgba(0,0,0,.5);
+}
+
+.in{
+  background:linear-gradient(135deg,#16a34a,#4ade80);
+}
+.out{
+  background:linear-gradient(135deg,#dc2626,#fb7185);
+}
+.net{
+  background:linear-gradient(135deg,#2563eb,#38bdf8);
+}
+
+.card small{opacity:.9}
+.card div{
+  font-size:26px;
+  font-weight:800;
+}
+
+/* CHART BOX */
+.chart-box{
+  background:#020617;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:20px;
+}
+
+/* CATEGORY LIST */
+.cat{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid #1e293b;
+  font-weight:600;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+
+.bottom-nav a{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  padding:14px;
+  border-radius:999px;
+  background:#2563eb;
+  color:white;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SUMMARY -->
+<div class="cards">
+  <div class="card in">
+    <small>Total Income</small>
+    <div id="totalIn">₹0</div>
+  </div>
+
+  <div class="card out">
+    <small>Total Expense</small>
+    <div id="totalOut">₹0</div>
+  </div>
+
+  <div class="card net">
+    <small>Net Balance</small>
+    <div id="net">₹0</div>
+  </div>
+</div>
+
+<!-- IN vs OUT -->
+<div class="chart-box">
+  <h3>Income vs Expense</h3>
+  <canvas id="ioChart"></canvas>
+</div>
+
+<!-- CATEGORY WISE -->
+<div class="chart-box">
+  <h3>Category-wise Expense</h3>
+  <div id="categoryList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="indexmobile.html">➕ Add</a>
+  <a href="historymobile.html">📜 History</a>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
+
+let chart;
+
+/* LOAD DATA */
+async function load(){
+  const res=await fetch(API_URL);
+  const data=await res.json();
+
+  let tin=0,tout=0;
+  const cat={};
+
+  data.forEach(t=>{
+    if(t.type==="IN"){
+      tin+=+t.amount;
+    }else{
+      tout+=+t.amount;
+      cat[t.category]=(cat[t.category]||0)+(+t.amount);
+    }
+  });
+
+  totalIn.textContent=`₹${tin}`;
+  totalOut.textContent=`₹${tout}`;
+  net.textContent=`₹${tin-tout}`;
+
+  renderChart(tin,tout);
+  renderCategories(cat);
+}
+
+/* CHART */
+function renderChart(i,o){
+  if(chart) chart.destroy();
+  chart=new Chart(ioChart,{
+    type:"doughnut",
+    data:{
+      labels:["Income","Expense"],
+      datasets:[{
+        data:[i,o],
+        backgroundColor:["#16a34a","#dc2626"]
+      }]
+    },
+    options:{
+      plugins:{legend:{labels:{color:"white"}}}
+    }
+  });
+}
+
+/* CATEGORY LIST */
+function renderCategories(cat){
+  categoryList.innerHTML="";
+  Object.keys(cat).forEach(k=>{
+    categoryList.innerHTML+=`
+      <div class="cat">
+        <span>${k}</span>
+        <span>₹${cat[k]}</span>
+      </div>
+    `;
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
