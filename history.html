@@ -108,6 +108,17 @@ td{padding:14px;font-size:14px;border-bottom:1px solid #1e293b}
 .inTxt{color:#4ade80;font-weight:700}
 .outTxt{color:#fb7185;font-weight:700}
 .money{font-family:Cambria,"Cambria Math",serif;font-weight:700}
+
+.action-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:700;
+}
+
+.edit{color:#38bdf8}
+.delete{color:#fb7185}
 </style>
 </head>
 
@@ -160,8 +171,6 @@ td{padding:14px;font-size:14px;border-bottom:1px solid #1e293b}
     <label>Category</label>
     <select id="categoryFilter">
       <option value="">All</option>
-
-      <!-- INCOME -->
       <optgroup label="Income">
         <option>Salary</option>
         <option>Freelance</option>
@@ -169,8 +178,6 @@ td{padding:14px;font-size:14px;border-bottom:1px solid #1e293b}
         <option>Investment</option>
         <option>Others</option>
       </optgroup>
-
-      <!-- EXPENSE -->
       <optgroup label="Expense">
         <option>Food</option>
         <option>Groceries</option>
@@ -203,6 +210,7 @@ td{padding:14px;font-size:14px;border-bottom:1px solid #1e293b}
   <th>Category</th>
   <th>Amount</th>
   <th>Note</th>
+  <th>Action</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -265,6 +273,37 @@ function totals(){
   netTotal.textContent=`₹${tin-tout}`;
 }
 
+/* EDIT (SAFE: amount + note only) */
+async function editTx(id){
+  const tx=transactions.find(t=>t.id===id);
+  const amt=prompt("Edit amount",tx.amount);
+  if(amt===null || amt<=0) return;
+
+  const noteVal=prompt("Edit note",tx.note||"");
+
+  tx.amount=+amt;
+  tx.note=noteVal;
+
+  await fetch(API_URL,{
+    method:"PUT",
+    body:JSON.stringify(tx)
+  });
+
+  fetchTransactions();
+}
+
+/* DELETE (TWO STEP VERIFY) */
+async function deleteTx(id){
+  if(!confirm("Delete this transaction?")) return;
+  if(!confirm("This action is PERMANENT. Confirm again.")) return;
+
+  await fetch(`${API_URL}?id=${id}`,{
+    method:"DELETE"
+  });
+
+  fetchTransactions();
+}
+
 /* TABLE */
 function render(){
   table.innerHTML="";
@@ -276,6 +315,11 @@ function render(){
         <td>${t.category}</td>
         <td class="money">₹${t.amount}</td>
         <td>${t.note||"-"}</td>
+        <td>
+          <button class="action-btn edit" onclick="editTx('${t.id}')">Edit</button>
+          |
+          <button class="action-btn delete" onclick="deleteTx('${t.id}')">Delete</button>
+        </td>
       </tr>
     `;
   });
