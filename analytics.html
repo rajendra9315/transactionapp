@@ -4,27 +4,25 @@
 <meta charset="UTF-8">
 <title>Analytics</title>
 
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 *{box-sizing:border-box}
 
-/* FONTS */
 body{
   margin:0;
   font-family:Candara, Calibri, Segoe, sans-serif;
-  background:#f6f7fb;
-  color:#1f2937;
-  padding:30px;
-}
-
-.money{
-  font-family:Cambria, "Cambria Math", serif;
-  font-weight:700;
+  background:linear-gradient(180deg,#020617,#0f172a);
+  color:#e5e7eb;
+  padding:20px;
 }
 
 .container{max-width:1200px;margin:auto}
+
+.money{
+  font-family:Cambria,"Cambria Math",serif;
+  font-weight:800;
+}
 
 /* HEADER */
 .header{
@@ -35,11 +33,11 @@ body{
 }
 
 .header a{
-  text-decoration:none;
-  background:#2563eb;
+  background:linear-gradient(135deg,#2563eb,#38bdf8);
   color:white;
-  padding:8px 14px;
+  padding:8px 16px;
   border-radius:999px;
+  text-decoration:none;
   font-size:14px;
 }
 
@@ -52,76 +50,104 @@ body{
 }
 
 .card{
-  background:white;
-  padding:18px;
-  border-radius:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  padding:20px;
+  border-radius:18px;
+  color:white;
+  box-shadow:0 15px 35px rgba(0,0,0,.45);
+  position:relative;
+  overflow:hidden;
 }
 
-.card small{color:#6b7280}
-.card span{font-size:22px}
+.card::after{
+  content:"";
+  position:absolute;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  top:-40px;
+  right:-40px;
+  background:rgba(255,255,255,.15);
+}
+
+.card small{opacity:.85}
+.card span{font-size:26px}
+
+/* CARD COLORS */
+.in{background:linear-gradient(135deg,#16a34a,#4ade80)}
+.out{background:linear-gradient(135deg,#dc2626,#fb7185)}
+.max{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
+.avg{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
 
 /* CHARTS */
 .charts{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:20px;
-  margin-bottom:35px;
+  margin-bottom:30px;
 }
 
 .chart-box{
-  background:white;
+  background:#020617;
+  border-radius:20px;
   padding:20px;
-  border-radius:16px;
-  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  box-shadow:0 15px 35px rgba(0,0,0,.6);
+  border:2px solid transparent;
 }
+
+.chart-inout{border-color:#22c55e}
+.chart-cat{border-color:#38bdf8}
 
 /* TABLE */
 .table-box{
-  background:white;
-  border-radius:16px;
+  background:#020617;
+  border-radius:20px;
   overflow:hidden;
-  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  box-shadow:0 15px 35px rgba(0,0,0,.6);
+  border:2px solid #1e293b;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-thead{background:#2563eb}
+table{width:100%;border-collapse:collapse}
+thead{background:linear-gradient(135deg,#2563eb,#38bdf8)}
 
 th{
-  color:white;
   padding:12px;
   font-size:13px;
   text-align:left;
 }
 
-/* COLORED COLUMN BORDERS */
-.col-date{border-left:5px solid #2563eb}
-.col-type{border-left:5px solid #16a34a}
-.col-cat{border-left:5px solid #0f766e}
-.col-amt{border-left:5px solid #dc2626}
-.col-note{border-left:5px solid #6b7280}
-
 td{
   padding:14px;
   font-size:14px;
+  border-bottom:1px solid #1e293b;
 }
 
-tbody tr{border-bottom:1px solid #e5e7eb}
+/* COLORFUL OUTLINES */
+.col-date{border-left:5px solid #38bdf8}
+.col-type{border-left:5px solid #22c55e}
+.col-cat{border-left:5px solid #0ea5e9}
+.col-amt{border-left:5px solid #fb7185}
+.col-note{border-left:5px solid #94a3b8}
 
-.in{color:#16a34a;font-weight:700}
-.out{color:#dc2626;font-weight:700}
+.inTxt{color:#4ade80;font-weight:700}
+.outTxt{color:#fb7185;font-weight:700}
+
+/* MOBILE */
+@media(max-width:900px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .charts{grid-template-columns:1fr}
+}
+
+@media(max-width:500px){
+  body{padding:14px}
+  .summary{grid-template-columns:1fr}
+  th,td{font-size:12px}
+}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<!-- HEADER -->
 <div class="header">
   <h2>Analytics & Summary</h2>
   <a href="index.html">← Dashboard</a>
@@ -129,19 +155,22 @@ tbody tr{border-bottom:1px solid #e5e7eb}
 
 <!-- SUMMARY -->
 <div class="summary">
-  <div class="card">
+  <div class="card in">
     <small>Total Income</small><br>
     ₹ <span id="totalIn" class="money">0</span>
   </div>
-  <div class="card">
+
+  <div class="card out">
     <small>Total Expense</small><br>
     ₹ <span id="totalOut" class="money">0</span>
   </div>
-  <div class="card">
+
+  <div class="card max">
     <small>Highest Expense</small><br>
     ₹ <span id="maxOut" class="money">0</span>
   </div>
-  <div class="card">
+
+  <div class="card avg">
     <small>Avg Daily Spend</small><br>
     ₹ <span id="avgSpend" class="money">0</span>
   </div>
@@ -149,13 +178,13 @@ tbody tr{border-bottom:1px solid #e5e7eb}
 
 <!-- CHARTS -->
 <div class="charts">
-  <div class="chart-box">
+  <div class="chart-box chart-inout">
     <h4>IN vs OUT</h4>
     <canvas id="inOutChart"></canvas>
   </div>
 
-  <div class="chart-box">
-    <h4>Category-wise Spend</h4>
+  <div class="chart-box chart-cat">
+    <h4>Category-wise Expense</h4>
     <canvas id="categoryChart"></canvas>
   </div>
 </div>
@@ -179,99 +208,92 @@ tbody tr{border-bottom:1px solid #e5e7eb}
 </div>
 
 <script>
-/* =================================================
-   🔴 PASTE GOOGLE WEB APP URL HERE
-   ================================================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
-/* Example:
-const API_URL = "https://script.google.com/macros/s/AKfycbxxxx/exec";
-*/
+const API_URL="https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
 
-let transactions = [];
-let inOutChart, categoryChart;
+let transactions=[],inOutChart,categoryChart;
 
-/* FETCH DATA FROM GOOGLE */
 async function fetchTransactions(){
-  const res = await fetch(API_URL);
-  transactions = await res.json();
+  const res=await fetch(API_URL);
+  transactions=await res.json();
   calculate();
 }
 
-/* CALCULATIONS + RENDER */
 function calculate(){
-  let totalIn = 0, totalOut = 0, maxOut = 0;
-  const days = new Set();
-  const categorySum = {};
+  let totalIn=0,totalOut=0,maxOut=0;
+  const days=new Set();
+  const categorySum={};
 
   transactions.forEach(t=>{
     if(t.type==="IN"){
-      totalIn += +t.amount;
+      totalIn+=+t.amount;
     }else{
-      totalOut += +t.amount;
-      maxOut = Math.max(maxOut, +t.amount);
-      categorySum[t.category] = (categorySum[t.category] || 0) + +t.amount;
+      totalOut+=+t.amount;
+      maxOut=Math.max(maxOut,+t.amount);
+      categorySum[t.category]=(categorySum[t.category]||0)+ +t.amount;
     }
     days.add(t.date);
   });
 
-  document.getElementById("totalIn").textContent = totalIn;
-  document.getElementById("totalOut").textContent = totalOut;
-  document.getElementById("maxOut").textContent = maxOut;
-  document.getElementById("avgSpend").textContent =
-    days.size ? Math.round(totalOut / days.size) : 0;
+  totalInEl.textContent=totalIn;
+  totalOutEl.textContent=totalOut;
+  maxOutEl.textContent=maxOut;
+  avgSpendEl.textContent=days.size?Math.round(totalOut/days.size):0;
 
-  renderCharts(totalIn, totalOut, categorySum);
+  renderCharts(totalIn,totalOut,categorySum);
   renderTable();
 }
 
-/* CHARTS */
-function renderCharts(totalIn, totalOut, categorySum){
+function renderCharts(tin,tout,cat){
   if(inOutChart) inOutChart.destroy();
   if(categoryChart) categoryChart.destroy();
 
-  inOutChart = new Chart(document.getElementById("inOutChart"),{
+  inOutChart=new Chart(inOutChartEl,{
     type:"doughnut",
     data:{
       labels:["IN","OUT"],
       datasets:[{
-        data:[totalIn,totalOut],
-        backgroundColor:["#16a34a","#dc2626"]
+        data:[tin,tout],
+        backgroundColor:["#22c55e","#fb7185"]
       }]
     }
   });
 
-  categoryChart = new Chart(document.getElementById("categoryChart"),{
+  categoryChart=new Chart(categoryChartEl,{
     type:"bar",
     data:{
-      labels:Object.keys(categorySum),
+      labels:Object.keys(cat),
       datasets:[{
-        label:"Amount",
-        data:Object.values(categorySum),
-        backgroundColor:"#2563eb"
+        data:Object.values(cat),
+        backgroundColor:"#38bdf8"
       }]
     }
   });
 }
 
-/* TABLE */
 function renderTable(){
   table.innerHTML="";
   transactions.slice(0,10).forEach(t=>{
-    table.innerHTML += `
+    table.innerHTML+=`
       <tr>
         <td class="col-date">${t.date}</td>
-        <td class="col-type ${t.type==="IN"?"in":"out"}">${t.type}</td>
+        <td class="col-type ${t.type==="IN"?"inTxt":"outTxt"}">${t.type}</td>
         <td class="col-cat">${t.category}</td>
         <td class="col-amt money">₹${t.amount}</td>
-        <td class="col-note">${t.note}</td>
+        <td class="col-note">${t.note||"-"}</td>
       </tr>
     `;
   });
 }
 
-/* INIT */
+/* SHORTCUT IDs */
+const totalInEl=totalIn;
+const totalOutEl=totalOut;
+const maxOutEl=maxOut;
+const avgSpendEl=avgSpend;
+const inOutChartEl=document.getElementById("inOutChart");
+const categoryChartEl=document.getElementById("categoryChart");
+
 fetchTransactions();
 </script>
-
 </body>
 </html>
