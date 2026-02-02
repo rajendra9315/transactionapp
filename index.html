@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Transaction Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { font-family: Arial; max-width: 900px; margin:auto; padding:15px; }
+    select, input, button { padding:8px; margin:5px 0; width:100%; }
+    table { width:100%; border-collapse: collapse; margin-top:15px; }
+    th, td { border:1px solid #ddd; padding:8px; text-align:center; }
+    th { background:#f4f4f4; }
+    .in { color:green; }
+    .out { color:red; }
+  </style>
+</head>
+
+<body>
+
+<h2>Transaction Tracker</h2>
+
+<!-- FILTER -->
+<select id="month"></select>
+<select id="year"></select>
+<button onclick="load()">Load</button>
+
+<!-- ADD ENTRY -->
+<h3>Add Transaction</h3>
+<input type="date" id="date">
+<input type="number" id="amount" placeholder="Amount">
+<select id="type">
+  <option value="IN">IN</option>
+  <option value="OUT">OUT</option>
+</select>
+<input id="note" placeholder="Note">
+<button onclick="addTx()">Add</button>
+
+<!-- TABLE -->
+<h3>Records</h3>
+<p><b>Balance:</b> <span id="balance">0</span></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<script>
+/* 🔧 CONFIG */
+const SUPABASE_URL = "https://kqxumpysaqfaajczqkxo.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeHVtcHlzYXFmYWFqY3pxa3hvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMzQ1ODQsImV4cCI6MjA4NTYxMDU4NH0.0ppUvcxp4MK9N0bAKpIBW8kcIV8O8ZM-LNiMt4YhlL8";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* INIT MONTH/YEAR */
+const m = document.getElementById("month");
+const y = document.getElementById("year");
+
+for (let i=0;i<12;i++) {
+  const d = new Date(0,i);
+  m.innerHTML += `<option value="${i+1}">${d.toLocaleString('default',{month:'long'})}</option>`;
+}
+
+const cy = new Date().getFullYear();
+for (let i=cy-5;i<=cy+1;i++) {
+  y.innerHTML += `<option>${i}</option>`;
+}
+
+m.value = new Date().getMonth()+1;
+y.value = cy;
+
+/* LOAD DATA */
+async function load() {
+  const month = m.value;
+  const year = y.value;
+
+  const start = `${year}-${month.padStart(2,'0')}-01`;
+  const end = `${year}-${month.padStart(2,'0')}-31`;
+
+  const { data } = await supabase
+    .from("transactions")
+    .select("*")
+    .gte("tx_date", start)
+    .lte("tx_date", end)
+    .order("tx_date");
+
+  let bal = 0;
+  rows.innerHTML = "";
+
+  data.forEach(t => {
+    bal += t.type === "IN" ? Number(t.amount) : -Number(t.amount);
+    rows.innerHTML += `
+      <tr>
+        <td>${t.tx_date}</td>
+        <td class="${t.type === 'IN' ? 'in' : 'out'}">${t.type}</td>
+        <td>${t.amount}</td>
+        <td>${t.note || ""}</td>
+      </tr>
+    `;
+  });
+
+  balance.innerText = bal;
+}
+
+/* ADD DATA */
+async function addTx() {
+  await supabase.from("transactions").insert({
+    tx_date: date.value,
+    amount: amount.value,
+    type: type.value,
+    note: note.value
+  });
+
+  load();
+}
+
+load();
+</script>
+
+</body>
+</html>
