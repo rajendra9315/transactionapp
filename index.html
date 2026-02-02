@@ -7,10 +7,11 @@
 <style>
 *{box-sizing:border-box}
 
-/* ===== FONTS ===== */
+/* ===== FONTS (IMPROVED VISIBILITY) ===== */
 body{
   margin:0;
   font-family:Candara, Calibri, Segoe, sans-serif;
+  font-size:15px;
   background:#f6f7fb;
   color:#1f2937;
   padding:30px;
@@ -20,6 +21,8 @@ body{
   font-family:Cambria, "Cambria Math", serif;
   font-weight:700;
 }
+
+label{font-weight:600}
 
 .container{max-width:1200px;margin:auto}
 
@@ -82,24 +85,24 @@ form{
   gap:16px;
 }
 
-label{font-size:13px}
-
 input,select{
-  padding:10px;
+  padding:11px;
   border-radius:8px;
   border:1px solid #d1d5db;
+  font-size:15px;
 }
 
 /* TYPE */
 .toggle{display:flex;gap:8px}
 .toggle button{
   flex:1;
-  padding:10px;
+  padding:11px;
   border-radius:999px;
   border:2px solid #d1d5db;
   background:white;
   cursor:pointer;
   font-weight:700;
+  font-size:14px;
 }
 .toggle .in.active{border-color:#16a34a;color:#16a34a}
 .toggle .out.active{border-color:#dc2626;color:#dc2626}
@@ -155,18 +158,19 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
   text-decoration:none;
   background:#2563eb;
   color:white;
-  padding:10px 18px;
+  padding:12px 20px;
   border-radius:999px;
   font-weight:700;
   box-shadow:0 6px 18px rgba(0,0,0,.25);
 }
 
-/* MOBILE */
+/* MOBILE (READABILITY ONLY) */
 @media(max-width:768px){
-  body{padding:15px}
+  body{padding:15px;font-size:14px}
   .dashboard{grid-template-columns:repeat(2,1fr)}
   .settings{grid-template-columns:1fr}
   form{grid-template-columns:1fr}
+  th,td{font-size:13px}
   .bottom-nav{padding:0 15px}
 }
 </style>
@@ -235,11 +239,29 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
   <div>
     <label>Category</label>
     <select id="category">
-      <option>Food</option>
-      <option>Travel</option>
-      <option>Rent</option>
-      <option>Bills</option>
-      <option>Others</option>
+      <!-- INCOME -->
+      <optgroup label="Income">
+        <option>Salary</option>
+        <option>Freelance</option>
+        <option>Business</option>
+        <option>Investment</option>
+        <option>Others</option>
+      </optgroup>
+
+      <!-- EXPENSE -->
+      <optgroup label="Expense">
+        <option>Food</option>
+        <option>Groceries</option>
+        <option>Travel</option>
+        <option>Fuel</option>
+        <option>Rent</option>
+        <option>Bills</option>
+        <option>Shopping</option>
+        <option>Medical</option>
+        <option>Education</option>
+        <option>Entertainment</option>
+        <option>EMI / Loan</option>
+      </optgroup>
     </select>
   </div>
 
@@ -283,7 +305,7 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
 </div>
 
 <script>
-/* 🔴 PASTE GOOGLE WEB APP URL HERE */
+/* 🔴 GOOGLE WEB APP URL */
 const API_URL = "https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
 
 let transactions=[];
@@ -291,6 +313,7 @@ let currentType="";
 
 date.valueAsDate=new Date();
 
+/* ===== JS LOGIC UNCHANGED ===== */
 function setType(t){
   currentType=t;
   document.querySelectorAll(".toggle button").forEach(b=>b.classList.remove("active"));
@@ -380,4 +403,3 @@ fetchTransactions();
 
 </body>
 </html>
-
