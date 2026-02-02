@@ -7,13 +7,13 @@
 <style>
 *{box-sizing:border-box}
 
-/* ===== FONTS (IMPROVED VISIBILITY) ===== */
+/* ===== FONTS ===== */
 body{
   margin:0;
   font-family:Candara, Calibri, Segoe, sans-serif;
   font-size:15px;
-  background:#f6f7fb;
-  color:#1f2937;
+  background:#0f172a;
+  color:#e5e7eb;
   padding:30px;
 }
 
@@ -22,7 +22,7 @@ body{
   font-weight:700;
 }
 
-label{font-weight:600}
+label{font-weight:600;color:#cbd5f5}
 
 .container{max-width:1200px;margin:auto}
 
@@ -31,6 +31,13 @@ label{font-weight:600}
 .outline-red{border-left:5px solid #dc2626}
 .outline-green{border-left:5px solid #16a34a}
 .outline-teal{border-left:5px solid #0f766e}
+
+/* TABLE COLUMN OUTLINES */
+.col-date{border-left:5px solid #2563eb}
+.col-type{border-left:5px solid #16a34a}
+.col-cat{border-left:5px solid #0f766e}
+.col-amt{border-left:5px solid #dc2626}
+.col-note{border-left:5px solid #6b7280}
 
 /* ===== DASHBOARD ===== */
 .dashboard{
@@ -44,13 +51,25 @@ label{font-weight:600}
   padding:22px;
   border-radius:14px;
   color:white;
-  box-shadow:0 6px 18px rgba(0,0,0,.15);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
-.balance{background:#2563eb}
-.spend{background:#dc2626}
-.remain{background:#16a34a}
-.today{background:#0f766e}
+/* 🔥 FULL COLOR DASHBOARD CARDS */
+.balance{
+  background:linear-gradient(135deg,#2563eb,#38bdf8);
+}
+
+.spend{
+  background:linear-gradient(135deg,#dc2626,#fb7185);
+}
+
+.remain{
+  background:linear-gradient(135deg,#16a34a,#4ade80);
+}
+
+.today{
+  background:linear-gradient(135deg,#0f766e,#2dd4bf);
+}
 
 .card small{opacity:.95}
 .card span{font-size:24px}
@@ -64,19 +83,19 @@ label{font-weight:600}
 }
 
 .settings div{
-  background:white;
+  background:#020617;
   padding:16px;
   border-radius:12px;
-  box-shadow:0 4px 14px rgba(0,0,0,.08);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
 /* ===== FORM ===== */
 .form-card{
-  background:white;
+  background:#020617;
   border-radius:16px;
   padding:24px;
   margin-bottom:30px;
-  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
 form{
@@ -88,7 +107,9 @@ form{
 input,select{
   padding:11px;
   border-radius:8px;
-  border:1px solid #d1d5db;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:#e5e7eb;
   font-size:15px;
 }
 
@@ -98,14 +119,14 @@ input,select{
   flex:1;
   padding:11px;
   border-radius:999px;
-  border:2px solid #d1d5db;
-  background:white;
+  border:2px solid #1e293b;
+  background:#020617;
+  color:#e5e7eb;
   cursor:pointer;
   font-weight:700;
-  font-size:14px;
 }
-.toggle .in.active{border-color:#16a34a;color:#16a34a}
-.toggle .out.active{border-color:#dc2626;color:#dc2626}
+.toggle .in.active{border-color:#16a34a;color:#4ade80}
+.toggle .out.active{border-color:#dc2626;color:#fb7185}
 
 /* PROOF */
 .preview img{
@@ -117,27 +138,31 @@ input,select{
 /* PROGRESS */
 .progress{
   height:8px;
-  background:#e5e7eb;
+  background:#1e293b;
   border-radius:999px;
   overflow:hidden;
 }
 .progress div{height:100%;background:#2563eb}
 
-/* TABLE */
+/* ===== TABLE ===== */
 .table-box{
-  background:white;
+  background:#020617;
   border-radius:16px;
   overflow:hidden;
-  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
 table{width:100%}
 thead{background:#2563eb}
 th{color:white;padding:12px;font-size:13px;text-align:left}
-td{padding:14px;font-size:14px}
+td{
+  padding:14px;
+  font-size:14px;
+  border-bottom:1px solid #1e293b;
+}
 
-.in{color:#16a34a;font-weight:700}
-.out{color:#dc2626;font-weight:700}
+.in{color:#4ade80;font-weight:700}
+.out{color:#fb7185;font-weight:700}
 
 img.proof{width:42px;border-radius:8px;cursor:pointer}
 
@@ -164,7 +189,7 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
   box-shadow:0 6px 18px rgba(0,0,0,.25);
 }
 
-/* MOBILE (READABILITY ONLY) */
+/* MOBILE */
 @media(max-width:768px){
   body{padding:15px;font-size:14px}
   .dashboard{grid-template-columns:repeat(2,1fr)}
@@ -182,22 +207,22 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
 
 <!-- DASHBOARD -->
 <div class="dashboard">
-  <div class="card balance outline-blue">
+  <div class="card balance">
     <small>Total Balance</small><br>
     ₹ <span id="bal" class="money">0</span>
   </div>
 
-  <div class="card spend outline-red">
+  <div class="card spend">
     <small>Total Spend</small><br>
     ₹ <span id="sp" class="money">0</span>
   </div>
 
-  <div class="card remain outline-green">
+  <div class="card remain">
     <small>Total Remain</small><br>
     ₹ <span id="rm" class="money">0</span>
   </div>
 
-  <div class="card today outline-teal">
+  <div class="card today">
     <small>Today</small><br>
     ₹ <span id="todaySpend" class="money">0</span> /
     ₹ <span id="todayLimit" class="money">—</span>
@@ -239,7 +264,6 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
   <div>
     <label>Category</label>
     <select id="category">
-      <!-- INCOME -->
       <optgroup label="Income">
         <option>Salary</option>
         <option>Freelance</option>
@@ -247,8 +271,6 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
         <option>Investment</option>
         <option>Others</option>
       </optgroup>
-
-      <!-- EXPENSE -->
       <optgroup label="Expense">
         <option>Food</option>
         <option>Groceries</option>
@@ -305,7 +327,6 @@ img.proof{width:42px;border-radius:8px;cursor:pointer}
 </div>
 
 <script>
-/* 🔴 GOOGLE WEB APP URL */
 const API_URL = "https://script.google.com/macros/s/AKfycbyucNg-_rXfdnIsHQf_XnitffZtS4KdLNkqyrMGUCUKWM1fWGimkrTpA-KBWicRHfsVwA/exec";
 
 let transactions=[];
@@ -313,7 +334,6 @@ let currentType="";
 
 date.valueAsDate=new Date();
 
-/* ===== JS LOGIC UNCHANGED ===== */
 function setType(t){
   currentType=t;
   document.querySelectorAll(".toggle button").forEach(b=>b.classList.remove("active"));
@@ -388,12 +408,12 @@ function render(){
   transactions.slice(0,5).forEach(t=>{
     table.innerHTML+=`
       <tr>
-        <td>${t.date}</td>
-        <td class="${t.type==="IN"?"in":"out"}">${t.type}</td>
-        <td>${t.category}</td>
-        <td class="money">₹${t.amount}</td>
-        <td>${t.proof?`<img class="proof" src="${t.proof}" onclick="open('${t.proof}')">`:"-"}</td>
-        <td>${t.note}</td>
+        <td class="col-date">${t.date}</td>
+        <td class="col-type ${t.type==="IN"?"in":"out"}">${t.type}</td>
+        <td class="col-cat">${t.category}</td>
+        <td class="col-amt money">₹${t.amount}</td>
+        <td class="col-note">${t.proof?`<img class="proof" src="${t.proof}" onclick="open('${t.proof}')">`:"-"}</td>
+        <td class="col-note">${t.note}</td>
       </tr>`;
   });
 }
