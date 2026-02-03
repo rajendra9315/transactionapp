@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:16px;
+}
+
+.card{
+  background:#020617;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+input,textarea{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:white;
+  font-size:16px;
+  margin-top:8px;
+}
+
+button{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border:none;
+  border-radius:999px;
+  background:#2563eb;
+  color:white;
+  font-weight:800;
+  font-size:16px;
+}
+
+.note-item{
+  border-bottom:1px solid #1e293b;
+  padding:10px 0;
+}
+
+.note-item strong{color:#38bdf8}
+
+/* NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  gap:8px;
+  padding:10px;
+}
+
+.bottom-nav a{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  padding:14px;
+  border-radius:999px;
+  background:#2563eb;
+  color:white;
+  font-weight:700;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h3>Add Note</h3>
+
+  <input type="date" id="date">
+  <input type="text" id="person" placeholder="Person name">
+  <textarea id="text" rows="3" placeholder="Write note..."></textarea>
+
+  <button onclick="saveNote()">Save Note</button>
+</div>
+
+<div class="card">
+  <h3>My Notes</h3>
+  <div id="notes"></div>
+</div>
+
+<div class="bottom-nav">
+  <a href="indexmobile.html">➕ Add</a>
+  <a href="historymobile.html">📜 History</a>
+  <a href="analyticsmobile.html">📊 Analytics</a>
+</div>
+
+<script>
+function getNotes(){
+  return JSON.parse(localStorage.getItem("myNotes")||"[]");
+}
+function saveNotes(n){
+  localStorage.setItem("myNotes",JSON.stringify(n));
+}
+
+date.valueAsDate=new Date();
+
+function saveNote(){
+  if(!person.value || !text.value) return alert("Fill all");
+
+  const notes=getNotes();
+  notes.unshift({
+    date:date.value,
+    person:person.value,
+    text:text.value
+  });
+
+  saveNotes(notes);
+  person.value="";
+  text.value="";
+  render();
+}
+
+function render(){
+  const notes=getNotes();
+  notesDiv=notes.map(n=>`
+    <div class="note-item">
+      <small>${n.date}</small><br>
+      <strong>${n.person}</strong><br>
+      ${n.text}
+    </div>
+  `).join("");
+
+  document.getElementById("notes").innerHTML=notesDiv;
+}
+
+render();
+</script>
+
+</body>
+</html>
